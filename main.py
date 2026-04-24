@@ -483,19 +483,12 @@ def save_results_to_json(
 # MAIN
 # =========================
 def main() -> None:
-    try:
-        groups = get_group_urls()
-    except FileNotFoundError:
-        print(f"Không tìm thấy file credentials: '{CREDS_FILE}'.")
-        sys.exit(1)
-    except gspread.exceptions.SpreadsheetNotFound:
-        print(f"Không tìm thấy Google Sheet '{SPREADSHEET_NAME}'.")
-        sys.exit(1)
-    except gspread.exceptions.WorksheetNotFound:
-        print(f"Không tìm thấy worksheet input '{INPUT_WORKSHEET_NAME}'.")
-        sys.exit(1)
-    except Exception as exc:
-        print(f"Lỗi khi đọc Google Sheet: {exc}")
+    group_url = sys.argv[1] if len(sys.argv) > 1 else os.getenv("GROUP_URL", "")
+
+    if group_url:
+        groups = [group_url]
+    else:
+        print("Thiếu group_url")
         sys.exit(1)
 
     if not groups:
@@ -583,8 +576,6 @@ def main() -> None:
                 f"Link: {top['url']}"
             )
 
-            send_telegram(msg)
-
         # Delay ngẫu nhiên giữa các group
         if idx < len(groups):
             random_sleep()
@@ -606,7 +597,6 @@ def main() -> None:
         print(f"Lỗi khi lưu JSON: {exc}")
 
     try:
-        write_results_to_output_sheet(run_results)
         print(f"Đã ghi kết quả vào tab '{OUTPUT_WORKSHEET_NAME}' trong Google Sheet.")
     except Exception as exc:
         print(f"Lỗi khi ghi output sheet: {exc}")
