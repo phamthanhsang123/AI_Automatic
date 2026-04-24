@@ -1,0 +1,7 @@
+﻿.env
+creds.json
+ngrok.exe
+__pycache__/
+*.pyc
+data.json
+top_posts_results.json
